@@ -3,5 +3,19 @@ name = "me_guinea_pig"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "me_guinea_pig"
+path = "src/main.rs"
+
 [dependencies]
-bevy = "0.19.0"
+bevy = { version = "0.19.0", features = ["android-native-activity"] }
+
+[package.metadata.android]
+app_name = "Me, Guinea Pig"
+package_name = "com.meguineapig.app"
+assets = "assets"
+resource = "android/app/src/main/res"
+icon = "android/app/src/main/res/mipmap/ic_launcher.png"

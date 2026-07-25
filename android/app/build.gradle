@@ -1,0 +1,26 @@
+plugins {
+    id 'com.android.application' version '8.4.2'
+}
+
+android {
+    namespace 'com.meguineapig.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.meguineapig.app"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "0.1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.0'
+}
