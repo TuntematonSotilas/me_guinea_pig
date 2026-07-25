@@ -16,6 +16,11 @@ The project now includes a minimal Android project structure under [android](and
 cargo run
 ```
 
+## Run Android
+```bash
+cargo android
+```
+
 ## Android build notes
 Prerequisites:
 - Rust target: `aarch64-linux-android`
