@@ -4,6 +4,9 @@ use bevy::input::touch::Touches;
 use bevy::prelude::*;
 use bevy::sprite_render::{ColorMaterial, MeshMaterial2d};
 use bevy::window::PrimaryWindow;
+use std::env;
+use std::path::PathBuf;
+use std::process::Command;
 
 const PLAYER_SPEED: f32 = 180.0;
 const DAY_LENGTH_SECS: f32 = 60.0;
@@ -51,6 +54,15 @@ struct DayNightCycle {
 }
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    if should_launch_android(&args) {
+        if let Err(err) = run_android_debug() {
+            eprintln!("failed to launch Android debug build: {err}");
+            std::process::exit(1);
+        }
+        return;
+    }
+
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .insert_resource(DayNightCycle { elapsed: 0.0 })
@@ -66,6 +78,38 @@ fn main() {
             ),
         )
         .run();
+}
+
+fn should_launch_android(args: &[String]) -> bool {
+    args.iter().any(|arg| arg == "android")
+}
+
+fn run_android_debug() -> Result<(), String> {
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    let script_path = PathBuf::from(manifest_dir).join("scripts/run-android.sh");
+
+    let status = Command::new("bash")
+        .arg(&script_path)
+        .current_dir(manifest_dir)
+        .status()
+        .map_err(|err| format!("failed to execute {}: {err}", script_path.display()))?;
+
+    if !status.success() {
+        return Err(format!("Android debug launcher exited with status {status}"));
+    }
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::should_launch_android;
+
+    #[test]
+    fn detects_android_launch_argument() {
+        assert!(should_launch_android(&["me_guinea_pig".to_string(), "android".to_string()]));
+        assert!(!should_launch_android(&["me_guinea_pig".to_string()]));
+    }
 }
 
 fn setup(

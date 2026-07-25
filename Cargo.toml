@@ -19,3 +19,6 @@ package_name = "com.meguineapig.app"
 assets = "assets"
 resource = "android/app/src/main/res"
 icon = "android/app/src/main/res/mipmap/ic_launcher.png"
+
+[package.metadata.commands]
+android = "bash scripts/run-android.sh"

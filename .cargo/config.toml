@@ -1,5 +1,2 @@
-[target.aarch64-linux-android]
-rustflags = ["-C", "link-arg=-Wl,--no-undefined"]
-
-[target.x86_64-linux-android]
-rustflags = ["-C", "link-arg=-Wl,--no-undefined"]
+[alias]
+android = "run -- android"
