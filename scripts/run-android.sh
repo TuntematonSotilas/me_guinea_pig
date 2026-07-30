@@ -15,6 +15,24 @@ if [[ -z "$ANDROID_HOME_VALUE" ]]; then
   exit 1
 fi
 
+if [[ -z "${ANDROID_NDK_HOME:-${NDK_HOME:-}}" ]]; then
+  NDK_DIR="$ANDROID_HOME_VALUE/ndk"
+  if [[ -d "$NDK_DIR" ]]; then
+    ANDROID_NDK_HOME="$(find "$NDK_DIR" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+    export ANDROID_NDK_HOME
+  fi
+fi
+
+if [[ -z "${ANDROID_NDK_HOME:-${NDK_HOME:-}}" ]]; then
+  echo "Android NDK not found. Install it via Android Studio SDK Manager or set ANDROID_NDK_HOME." >&2
+  exit 1
+fi
+
+if ! command -v cargo-ndk >/dev/null 2>&1; then
+  echo "cargo-ndk is required. Install it with: cargo install cargo-ndk" >&2
+  exit 1
+fi
+
 ADB_BIN="${ADB:-}"
 if [[ -z "$ADB_BIN" ]]; then
   if [[ -x "$ANDROID_HOME_VALUE/platform-tools/adb" ]]; then
@@ -30,7 +48,7 @@ fi
 APK_PATH="$ANDROID_DIR/app/build/outputs/apk/debug/app-debug.apk"
 
 echo "Building Android native library..."
-cargo build --target aarch64-linux-android --lib
+cargo ndk -t arm64-v8a -P 26 -o "$ANDROID_DIR/app/src/main/jniLibs" build --lib
 
 echo "Building Android debug APK..."
 (
