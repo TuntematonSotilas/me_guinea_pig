@@ -33,6 +33,43 @@ if ! command -v cargo-ndk >/dev/null 2>&1; then
   exit 1
 fi
 
+APK_PATH="$ANDROID_DIR/app/build/outputs/apk/debug/app-debug.apk"
+BUILD_TYPE="debug"
+GRADLE_TASK="app:assembleDebug"
+CARGO_BUILD_ARGS=()
+
+if [[ "${1:-}" == "--release" ]]; then
+  BUILD_TYPE="release"
+  GRADLE_TASK="app:assembleRelease"
+  CARGO_BUILD_ARGS+=(--release)
+elif [[ $# -gt 0 ]]; then
+  echo "Unknown option: $1" >&2
+  exit 1
+fi
+
+if [[ "$BUILD_TYPE" == "release" ]]; then
+  APK_PATH="$ANDROID_DIR/app/build/outputs/apk/release/app-release.apk"
+fi
+
+echo "Building Android native library ($BUILD_TYPE)..."
+cargo ndk -t arm64-v8a -P 26 -o "$ANDROID_DIR/app/src/main/jniLibs" build --lib "${CARGO_BUILD_ARGS[@]}"
+
+echo "Building Android $BUILD_TYPE APK..."
+(
+  cd "$ANDROID_DIR"
+  bash gradlew "$GRADLE_TASK"
+)
+
+if [[ ! -f "$APK_PATH" ]]; then
+  echo "APK was not produced: $APK_PATH" >&2
+  exit 1
+fi
+
+if [[ "$BUILD_TYPE" == "release" ]]; then
+  echo "Release APK created: $APK_PATH"
+  exit 0
+fi
+
 ADB_BIN="${ADB:-}"
 if [[ -z "$ADB_BIN" ]]; then
   if [[ -x "$ANDROID_HOME_VALUE/platform-tools/adb" ]]; then
@@ -43,22 +80,6 @@ if [[ -z "$ADB_BIN" ]]; then
     echo "adb was not found. Install Android platform-tools or set ADB/ANDROID_HOME." >&2
     exit 1
   fi
-fi
-
-APK_PATH="$ANDROID_DIR/app/build/outputs/apk/debug/app-debug.apk"
-
-echo "Building Android native library..."
-cargo ndk -t arm64-v8a -P 26 -o "$ANDROID_DIR/app/src/main/jniLibs" build --lib
-
-echo "Building Android debug APK..."
-(
-  cd "$ANDROID_DIR"
-  bash gradlew app:assembleDebug
-)
-
-if [[ ! -f "$APK_PATH" ]]; then
-  echo "APK was not produced: $APK_PATH" >&2
-  exit 1
 fi
 
 echo "Installing APK on emulator..."

@@ -1,2 +1,3 @@
 [alias]
 android = "run -- android"
+android-build = "run -- android-build"

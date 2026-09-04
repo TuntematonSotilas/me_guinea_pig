@@ -21,6 +21,14 @@ cargo run
 cargo android
 ```
 
+Build an installable release APK without installing it:
+```bash
+cargo android-build
+```
+
+The release APK is signed with the Android debug key for local testing. It must
+use a private release keystore before being published.
+
 ## Android build notes
 Prerequisites:
 - Rust target: `aarch64-linux-android`
