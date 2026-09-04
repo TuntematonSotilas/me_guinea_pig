@@ -26,17 +26,4 @@ Prerequisites:
 - Rust target: `aarch64-linux-android`
 - Android SDK + NDK
 - Java runtime
-- `cargo-ndk` (installed and ready)
-
-Recommended build flow:
-```bash
-cargo ndk -t arm64-v8a -o android/app/src/main/jniLibs build
-```
-
-If the NDK toolchain is installed, the following check should work:
-```bash
-rustup target add aarch64-linux-android
-cargo check --target aarch64-linux-android
-```
-
-The Android packaging path is now wired for `cargo-ndk` and can be used once the NDK toolchain is available.
+- install `cargo-ndk` 

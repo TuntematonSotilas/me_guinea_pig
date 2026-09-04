@@ -3,7 +3,7 @@ use bevy::input::mouse::MouseButton;
 use bevy::input::touch::Touches;
 use bevy::prelude::*;
 use bevy::sprite_render::{ColorMaterial, MeshMaterial2d};
-use bevy::window::PrimaryWindow;
+use bevy::window::{PrimaryWindow, WindowResolution};
 use bevy::winit::WinitSettings;
 
 const PLAYER_SPEED: f32 = 180.0;
@@ -53,7 +53,18 @@ struct DayNightCycle {
 
 pub fn run() {
     App::new()
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        resolution: WindowResolution::new(1280, 720)
+                            .with_scale_factor_override(1.0),
+                        ..default()
+                    }),
+                    ..default()
+                }),
+        )
         .insert_resource(WinitSettings::mobile())
         .insert_resource(DayNightCycle { elapsed: 0.0 })
         .add_systems(Startup, setup)
