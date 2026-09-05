@@ -83,6 +83,7 @@ if [[ -z "$ADB_BIN" ]]; then
 fi
 
 echo "Installing APK on emulator..."
+"$ADB_BIN" shell am force-stop com.meguineapig.app
 "$ADB_BIN" install -r "$APK_PATH"
 
 echo "Launching app on the emulator..."

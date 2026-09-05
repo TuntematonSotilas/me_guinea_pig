@@ -1,9 +1,13 @@
 use bevy::input::ButtonInput;
 use bevy::input::mouse::MouseButton;
 use bevy::input::touch::Touches;
+use bevy::app::PluginGroup;
+use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy::render::RenderPlugin;
-use bevy::render::settings::{RenderCreation, WgpuSettings, WgpuSettingsPriority};
+use bevy::render::settings::{
+    RenderCreation, WgpuLimits, WgpuSettings, WgpuSettingsPriority,
+};
 use bevy::sprite_render::{ColorMaterial, MeshMaterial2d};
 use bevy::window::{PrimaryWindow, WindowResolution};
 use bevy::winit::WinitSettings;
@@ -54,9 +58,18 @@ struct DayNightCycle {
 }
 
 pub fn run() {
+    let window_resolution = if cfg!(target_os = "android") {
+        WindowResolution::new(960, 540)
+    } else {
+        WindowResolution::new(1280, 720)
+    }
+    .with_scale_factor_override(1.0);
+
     App::new()
         .add_plugins(
             DefaultPlugins
+                .build()
+                .disable::<LogPlugin>()
                 .set(ImagePlugin::default_nearest())
                 .set(RenderPlugin {
                     render_creation: RenderCreation::Automatic(Box::new(WgpuSettings {
@@ -70,14 +83,20 @@ pub fn run() {
                         } else {
                             WgpuSettingsPriority::Functionality
                         },
+                        limits: if cfg!(target_os = "android") {
+                            let mut limits = WgpuLimits::downlevel_webgl2_defaults();
+                            limits.max_inter_stage_shader_variables = 15;
+                            limits
+                        } else {
+                            WgpuLimits::default()
+                        },
                         ..default()
                     })),
                     ..default()
                 })
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        resolution: WindowResolution::new(1280, 720)
-                            .with_scale_factor_override(1.0),
+                        resolution: window_resolution,
                         ..default()
                     }),
                     ..default()
