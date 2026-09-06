@@ -84,6 +84,7 @@ fi
 
 echo "Installing APK on emulator..."
 "$ADB_BIN" shell am force-stop com.meguineapig.app
+"$ADB_BIN" uninstall com.meguineapig.app >/dev/null 2>&1 || true
 "$ADB_BIN" install -r "$APK_PATH"
 
 echo "Launching app on the emulator..."

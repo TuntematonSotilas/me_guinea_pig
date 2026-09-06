@@ -8,7 +8,6 @@
         <activity
             android:name="android.app.NativeActivity"
             android:exported="true"
-            android:launchMode="singleTask"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|navigation|uiMode|density|fontScale|locale|layoutDirection">
             <meta-data
                 android:name="android.app.lib_name"

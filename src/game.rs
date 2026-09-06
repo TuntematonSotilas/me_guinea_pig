@@ -5,11 +5,9 @@ use bevy::app::PluginGroup;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy::render::RenderPlugin;
-use bevy::render::settings::{
-    RenderCreation, WgpuLimits, WgpuSettings, WgpuSettingsPriority,
-};
+use bevy::render::settings::{RenderCreation, WgpuSettings, WgpuSettingsPriority};
 use bevy::sprite_render::{ColorMaterial, MeshMaterial2d};
-use bevy::window::{PrimaryWindow, WindowResolution};
+use bevy::window::{PresentMode, PrimaryWindow, WindowResolution};
 use bevy::winit::WinitSettings;
 
 const PLAYER_SPEED: f32 = 180.0;
@@ -78,18 +76,7 @@ pub fn run() {
                         } else {
                             None
                         },
-                        priority: if cfg!(target_os = "android") {
-                            WgpuSettingsPriority::WebGL2
-                        } else {
-                            WgpuSettingsPriority::Functionality
-                        },
-                        limits: if cfg!(target_os = "android") {
-                            let mut limits = WgpuLimits::downlevel_webgl2_defaults();
-                            limits.max_inter_stage_shader_variables = 15;
-                            limits
-                        } else {
-                            WgpuLimits::default()
-                        },
+                        priority: WgpuSettingsPriority::Functionality,
                         ..default()
                     })),
                     ..default()
@@ -97,6 +84,7 @@ pub fn run() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         resolution: window_resolution,
+                        present_mode: PresentMode::Fifo,
                         ..default()
                     }),
                     ..default()
