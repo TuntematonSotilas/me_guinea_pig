@@ -5,7 +5,9 @@ use bevy::app::PluginGroup;
 use bevy::log::LogPlugin;
 use bevy::prelude::*;
 use bevy::render::RenderPlugin;
-use bevy::render::settings::{RenderCreation, WgpuSettings, WgpuSettingsPriority};
+use bevy::render::settings::{
+    RenderCreation, WgpuLimits, WgpuSettings, WgpuSettingsPriority,
+};
 use bevy::sprite_render::{ColorMaterial, MeshMaterial2d};
 use bevy::window::{PresentMode, PrimaryWindow, WindowResolution};
 use bevy::winit::WinitSettings;
@@ -77,6 +79,13 @@ pub fn run() {
                             None
                         },
                         priority: WgpuSettingsPriority::Functionality,
+                        limits: if cfg!(target_os = "android") {
+                            let mut limits = WgpuLimits::downlevel_webgl2_defaults();
+                            limits.max_inter_stage_shader_variables = 15;
+                            limits
+                        } else {
+                            WgpuLimits::default()
+                        },
                         ..default()
                     })),
                     ..default()

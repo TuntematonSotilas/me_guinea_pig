@@ -36,12 +36,10 @@ fi
 APK_PATH="$ANDROID_DIR/app/build/outputs/apk/debug/app-debug.apk"
 BUILD_TYPE="debug"
 GRADLE_TASK="app:assembleDebug"
-CARGO_BUILD_ARGS=()
 
 if [[ "${1:-}" == "--release" ]]; then
   BUILD_TYPE="release"
   GRADLE_TASK="app:assembleRelease"
-  CARGO_BUILD_ARGS+=(--release)
 elif [[ $# -gt 0 ]]; then
   echo "Unknown option: $1" >&2
   exit 1
@@ -52,7 +50,11 @@ if [[ "$BUILD_TYPE" == "release" ]]; then
 fi
 
 echo "Building Android native library ($BUILD_TYPE)..."
-cargo ndk -t arm64-v8a -P 26 -o "$ANDROID_DIR/app/src/main/jniLibs" build --lib "${CARGO_BUILD_ARGS[@]}"
+NATIVE_BUILD_ARGS=(--release)
+if [[ "$BUILD_TYPE" == "release" ]]; then
+  NATIVE_BUILD_ARGS=(--release)
+fi
+cargo ndk -t arm64-v8a -P 26 -o "$ANDROID_DIR/app/src/main/jniLibs" build --lib "${NATIVE_BUILD_ARGS[@]}"
 
 echo "Building Android $BUILD_TYPE APK..."
 (
